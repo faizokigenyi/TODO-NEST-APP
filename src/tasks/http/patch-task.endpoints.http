@@ -1,0 +1,6 @@
+PATCH http://localhost:3000/tasks/3
+Content-Type: application/json
+
+{
+    "title": "Finish NestJs Task By Tomorrow morning"
+}

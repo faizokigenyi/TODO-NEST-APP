@@ -1,0 +1,9 @@
+POST http://localhost:3000/tasks
+Content-Type: application/json
+
+{
+    "title": "Create 404 error page",
+    "description": "Design a custom 404 page with a back to home button.",
+    "completed": false,
+    "priority": "low"
+}
