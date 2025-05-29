@@ -10,9 +10,9 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: 'http://localhost:5173', // your frontend origin
+    origin: 'https://todo-list-frontend-ym77.vercel.app', // your frontend origin
     credentials: true, // if you’re sending cookies or auth headers
   });
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
