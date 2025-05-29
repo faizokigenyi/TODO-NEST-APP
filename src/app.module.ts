@@ -16,7 +16,7 @@ import { TaskEntity } from './tasks/task.entity';
         type: 'postgres',
         entities: [TaskEntity],
         host: 'localhost',
-        port: 5432,
+        port: Number(process.env.DB_PORT),
         username: 'postgres',
         password: '1234',
         synchronize: true,

@@ -9,6 +9,10 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  app.enableCors({
+    origin: 'http://localhost:5173', // your frontend origin
+    credentials: true, // if you’re sending cookies or auth headers
+  });
   await app.listen(3000);
 }
 bootstrap();
