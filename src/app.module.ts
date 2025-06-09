@@ -23,7 +23,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         host: configService.get('DATABASE_HOST'),
         port: parseInt(configService.get('DATABASE_PORT')),
         username: configService.get('DATABASE_USER'),
-        password: '1234', // Use a secure way to handle passwords in production
+        password: configService.get('DATABASE_PASSWORD'), // Use a secure way to handle passwords in production
         synchronize: true,
         database: configService.get('DATABASE_NAME'),
       }),
