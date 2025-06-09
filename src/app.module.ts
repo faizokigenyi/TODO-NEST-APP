@@ -1,30 +1,36 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { TasksModule } from './tasks/tasks.module';
 import { TaskEntity } from './tasks/task.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // Load .env automatically
-
+    ConfigModule.forRoot({
+      isGlobal: true, // Make ConfigModule global
+      envFilePath: '.env', // Load environment variables from .env file
+    }),
+    TasksModule,
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
+      imports: [ConfigModule], // Import ConfigModule to access environment variables
+      inject: [ConfigService], // Inject ConfigService to access configuration
+      useFactory: (configService: ConfigService) => ({
+        // TypeORM configuration
         type: 'postgres',
-        url: config.get<string>('DATABASE_URL'), // Secure URL
         entities: [TaskEntity],
-        autoLoadEntities: true,
-        synchronize: true, // ⚠️ true for dev only — use migrations in prod
+        host: configService.get('DATABASE_HOST'),
+        port: parseInt(configService.get('DATABASE_PORT')),
+        username: configService.get('DATABASE_USER'),
+        password: '1234', // Use a secure way to handle passwords in production
+        synchronize: true,
+        database: configService.get('DATABASE_NAME'),
       }),
     }),
-
-    TasksModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConfigService],
+  exports: [ConfigService],
 })
 export class AppModule {}
