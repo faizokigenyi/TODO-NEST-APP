@@ -6,7 +6,11 @@ import { BcryptProvider } from './providers/bcrypt.provider';
 import { forwardRef } from '@nestjs/common';
 import { UsersModule } from 'src/users/users.module';
 import { SignInProvider } from './providers/sign-in.provider';
-
+import { ConfigModule } from '@nestjs/config';
+import jwtConfig from './config/jwt.config';
+import { JwtModule } from '@nestjs/jwt';
+import { GenerateTokensProvider } from './providers/generate-tokens.provider';
+import { RefreshTokensProvider } from './providers/refresh-tokens.provider';
 @Module({
   providers: [
     AuthService,
@@ -15,9 +19,16 @@ import { SignInProvider } from './providers/sign-in.provider';
       provide: HashingProvider,
       useClass: BcryptProvider,
     },
+    GenerateTokensProvider,
+    RefreshTokensProvider,
   ],
   controllers: [AuthController],
-  imports: [forwardRef(() => UsersModule)],
+  imports: [
+    forwardRef(() => UsersModule),
+    /**This jwtConfig.asProvider helps to avoid extra boiler plate code */
+    JwtModule.registerAsync(jwtConfig.asProvider()),
+    ConfigModule.forFeature(jwtConfig),
+  ],
   exports: [AuthService, HashingProvider],
 })
 export class AuthModule {}

@@ -72,4 +72,29 @@ export class UsersService {
   public async findOneByEmail(email: string) {
     return await this.findOneUserByEmailProvider.findOneByEmail(email);
   }
+  public async findOneById(id: number): Promise<User> {
+    let user: User | null = null;
+
+    try {
+      user = await this.usersRepository.findOneBy({
+        id,
+      });
+    } catch {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment please try later',
+        {
+          description: 'Error connecting to the the datbase',
+        },
+      );
+    }
+
+    /**
+     * Handle the user does not exist
+     */
+    if (!user) {
+      throw new BadRequestException('The user id does not exist');
+    }
+
+    return user;
+  }
 }

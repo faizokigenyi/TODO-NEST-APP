@@ -6,8 +6,9 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/providers/users-service';
-import { HashingProvider } from './hashing.provider';
 import { SignInDto } from '../dtos/signin.dto';
+import { HashingProvider } from './hashing.provider';
+import { GenerateTokensProvider } from './generate-tokens.provider';
 
 @Injectable()
 export class SignInProvider {
@@ -20,6 +21,11 @@ export class SignInProvider {
      * Inject the hashingProvider
      */
     private readonly hashingProvider: HashingProvider,
+
+    /**
+     * Inject generateTokensProvider
+     */
+    private readonly generateTokensProvider: GenerateTokensProvider,
   ) {}
 
   public async signIn(signInDto: SignInDto) {
@@ -46,7 +52,7 @@ export class SignInProvider {
       throw new UnauthorizedException('Password does not match');
     }
 
-    // Send confirmation
-    return true;
+    // Generate access token
+    return await this.generateTokensProvider.generateTokens(user);
   }
 }
