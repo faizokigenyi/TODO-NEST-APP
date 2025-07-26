@@ -10,7 +10,10 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: 'https://todo-list-frontend-ym77.vercel.app', // your frontend origin
+    origin: [
+      'https://todo-list-frontend-ym77.vercel.app',
+      'http://localhost:3000',
+    ],
     credentials: true, // if you’re sending cookies or auth headers
   });
   await app.listen(process.env.PORT || 3000);

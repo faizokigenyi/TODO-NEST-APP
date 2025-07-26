@@ -5,6 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TasksModule } from './tasks/tasks.module';
 import { TaskEntity } from './tasks/task.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { User } from './users/user.entity';
+
 
 @Module({
   imports: [
@@ -19,7 +23,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => ({
         // TypeORM configuration
         type: 'postgres',
-        entities: [TaskEntity],
+        entities: [TaskEntity, User],
         host: configService.get('DATABASE_HOST'),
         port: parseInt(configService.get('DATABASE_PORT')),
         username: configService.get('DATABASE_USER'),
@@ -28,6 +32,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get('DATABASE_NAME'),
       }),
     }),
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, ConfigService],
