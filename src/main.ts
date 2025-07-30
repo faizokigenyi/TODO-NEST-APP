@@ -13,6 +13,7 @@ async function bootstrap() {
     origin: [
       'https://todo-list-frontend-ym77.vercel.app',
       'http://localhost:3000',
+      'https://zmits.singles',
     ],
     credentials: true, // if you’re sending cookies or auth headers
   });

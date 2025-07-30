@@ -31,9 +31,9 @@ export class FindOneUserByEmailProvider {
       });
     }
 
-    if (!user) {
-      throw new UnauthorizedException('User does not exists');
-    }
+    // if (!user) {
+    //   throw new UnauthorizedException('User does not exists');
+    // }
 
     return user;
   }

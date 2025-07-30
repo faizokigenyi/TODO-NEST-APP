@@ -14,24 +14,21 @@ import { forwardRef } from '@nestjs/common';
 @Injectable()
 export class CreateUserProvider {
   constructor(
-    /**inject repository */
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    /** inject Hashing provider */
+
     @Inject(forwardRef(() => HashingProvider))
     private readonly hashingProvider: HashingProvider,
   ) {}
+
   public async createUser(createUserDto: CreateUserDto) {
     let existingUser = undefined;
 
     try {
-      // Check is user exists with same email
       existingUser = await this.usersRepository.findOne({
         where: { email: createUserDto.email },
       });
     } catch {
-      // Might save the details of the exception
-      // Information which is sensitive
       throw new RequestTimeoutException(
         'Unable to process your request at the moment please try later',
         {
@@ -40,30 +37,24 @@ export class CreateUserProvider {
       );
     }
 
-    // Handle exception
     if (existingUser) {
       throw new BadRequestException(
         'The user already exists, please check your email.',
       );
     }
 
-    // Create a new user
-    let newUser = this.usersRepository.create({
-      ...createUserDto,
-      password: await this.hashingProvider.hashPassword(createUserDto.password),
-    });
+    // ✅ Initialize newUser before saving
+    const newUser = this.usersRepository.create(createUserDto);
 
     try {
-      newUser = await this.usersRepository.save(newUser);
+      return await this.usersRepository.save(newUser);
     } catch {
       throw new RequestTimeoutException(
         'Unable to process your request at the moment please try later',
         {
-          description: 'Error connecting to the the datbase',
+          description: 'Error connecting to the the database',
         },
       );
     }
-
-    return newUser;
   }
 }

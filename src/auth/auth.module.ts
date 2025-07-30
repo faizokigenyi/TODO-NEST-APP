@@ -11,10 +11,12 @@ import jwtConfig from './config/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import { GenerateTokensProvider } from './providers/generate-tokens.provider';
 import { RefreshTokensProvider } from './providers/refresh-tokens.provider';
+import { SignUpProvider } from './providers/sign-up.provider';
 @Module({
   providers: [
     AuthService,
     SignInProvider,
+    SignUpProvider,
     {
       provide: HashingProvider,
       useClass: BcryptProvider,
