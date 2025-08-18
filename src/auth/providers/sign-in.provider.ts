@@ -30,7 +30,6 @@ export class SignInProvider {
     }
 
     let isPasswordValid = false;
-
     try {
       isPasswordValid = await this.hashingProvider.comparePassword(
         signInDto.password,
@@ -45,6 +44,14 @@ export class SignInProvider {
       throw new UnauthorizedException('Invalid password');
     }
 
-    return this.generateTokensProvider.generateTokens(user);
+    // Get the tokens
+    const tokens = await this.generateTokensProvider.generateTokens(user);
+
+    // Return tokens + userId
+    return {
+      ...tokens,
+      userId: user.id,
+      userName: user.firstName, // optional, useful for greeting
+    };
   }
 }

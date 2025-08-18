@@ -14,9 +14,11 @@ async function bootstrap() {
       'https://todo-list-frontend-ym77.vercel.app',
       'http://localhost:3000',
       'https://zmits.singles',
+      'http://localhost:5173',
     ],
-    credentials: true, // if you’re sending cookies or auth headers
+    credentials: true,
   });
+
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

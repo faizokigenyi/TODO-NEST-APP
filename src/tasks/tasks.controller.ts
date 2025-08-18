@@ -1,52 +1,66 @@
 import {
-  Body,
   Controller,
-  Delete,
-  Get,
+  Post,
+  Body,
   Param,
   ParseIntPipe,
-  Patch,
-  Post,
+  Get,
+  Put,
+  Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { TasksService } from './providers/tasks.service';
-import { GetTasksParamDto } from './dtos/get-tasks-param.dto';
 import { CreateTaskDto } from './dtos/create-task.dto';
-import { PatchTaskDto } from './dtos/Patch-task.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
 
-@Controller('tasks')
+@Controller('users/:userId/tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  @Get()
-  public getAllTasks() {
-    return this.tasksService.findAll();
-  }
-
-  @Get('/:id')
-  public getTaskById(
-    @Param('id', new ParseIntPipe())
-    id: number,
-  ) {
-    return this.tasksService.findOneById(id);
-  }
-
+  // Create a new task for a specific user
   @Post()
-  public createPost(@Body() createTaskDto: CreateTaskDto) {
-    return this.tasksService.createTask(createTaskDto);
-  }
-
-  @Patch('/:id')
-  public patchTask(
-    @Param('id', new ParseIntPipe())
-    id: number,
-    @Body()
-    patchUserDto: PatchTaskDto,
+  public async createTask(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() createTaskDto: CreateTaskDto,
   ) {
-    return this.tasksService.update(id, patchUserDto);
+    return this.tasksService.createTask(userId, createTaskDto);
   }
 
+  // Get all tasks for a specific user
+  @Get()
+  public async findAll(@Param('userId', ParseIntPipe) userId: number) {
+    return await this.tasksService.findAllByUserId(userId);
+  }
+
+  // Get one task by ID for a specific user
+  @Get(':id')
+  public async findOne(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const task = await this.tasksService.findOneByIdAndUser(id, userId);
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found for this user`);
+    }
+    return task;
+  }
+
+  // Update a task for a specific user
+  @Put(':id')
+  public async updateTask(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
+    return this.tasksService.updateTask(id, userId, updateTaskDto);
+  }
+
+  // Delete a task for a specific user
   @Delete(':id')
-  public deleteTask(@Param() getTaskParamDto: GetTasksParamDto) {
-    return this.tasksService.delete(getTaskParamDto.id);
+  public async deleteTask(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.tasksService.deleteTask(id, userId);
   }
 }
