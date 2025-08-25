@@ -15,6 +15,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://zmits.singles',
       'http://localhost:5173',
+      'https://task-list-front-end-env.vercel.app',
     ],
     credentials: true,
   });

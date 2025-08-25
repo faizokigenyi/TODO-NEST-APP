@@ -20,29 +20,28 @@ export class TasksService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  // Create a task for a specific user
+  // Create a task for the logged-in user
   public async createTask(userId: number, createTaskDto: CreateTaskDto) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
+
+    const task = this.taskRepository.create({
+      ...createTaskDto,
+      completed: false,
+      user,
+    });
+
     try {
-      const user = await this.userRepository.findOne({ where: { id: userId } });
-      if (!user)
-        throw new NotFoundException(`User with ID ${userId} not found`);
-
-      const task = this.taskRepository.create({
-        ...createTaskDto,
-        completed: false,
-        user,
-      });
-
-      return this.taskRepository.save(task);
+      return await this.taskRepository.save(task);
     } catch {
       throw new InternalServerErrorException('Failed to create task');
     }
   }
 
-  // Find all tasks for a user
+  // Find all tasks for the logged-in user
   public async findAllByUserId(userId: number) {
     try {
-      return this.taskRepository.find({
+      return await this.taskRepository.find({
         where: { user: { id: userId } },
         relations: ['user'],
       });
@@ -51,22 +50,19 @@ export class TasksService {
     }
   }
 
-  // Find one task by ID and user
+  // Find a single task by ID for the logged-in user
   public async findOneByIdAndUser(taskId: number, userId: number) {
     const task = await this.taskRepository.findOne({
       where: { id: taskId, user: { id: userId } },
       relations: ['user'],
     });
 
-    if (!task)
-      throw new NotFoundException(
-        `Task with ID ${taskId} not found for this user`,
-      );
+    if (!task) throw new NotFoundException(`Task with ID ${taskId} not found`);
 
     return task;
   }
 
-  // Update a task for a specific user
+  // Update a task for the logged-in user
   public async updateTask(
     taskId: number,
     userId: number,
@@ -74,15 +70,16 @@ export class TasksService {
   ) {
     const task = await this.findOneByIdAndUser(taskId, userId);
 
-    Object.assign(task, updateTaskDto); // Merge updates
+    Object.assign(task, updateTaskDto);
+
     try {
-      return this.taskRepository.save(task);
+      return await this.taskRepository.save(task);
     } catch {
       throw new InternalServerErrorException('Failed to update task');
     }
   }
 
-  // Delete a task for a specific user
+  // Delete a task for the logged-in user
   public async deleteTask(taskId: number, userId: number) {
     const task = await this.findOneByIdAndUser(taskId, userId);
 
